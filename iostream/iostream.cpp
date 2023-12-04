@@ -26,38 +26,26 @@ void BrListFromFirst(Elem* head) {
 }
 
 // Добавление элемента
-void AddElem(Elem*& head, string value) {
-    Elem* NewNode = new Elem; // Создание нового
-    NewNode->value = value;
-    NewNode->next = nullptr;
-    NewNode->prev = nullptr;
-    if (head == nullptr) // Список пустой
+void AddElem(Elem*& head, string value)
+{
+    if (head == nullptr) // если список пустой
     {
-        head = NewNode;
+        head = new Elem;
+        head->value = value;
+        head->next = nullptr;
         return;
     }
-    Elem* H = head;
-    if (head->value > value) { // Элемент встает на первое место
-        head = NewNode;
-        head->next = H;
-        return;
-    }
-    Elem* C;
+    Elem* H = head; // Для прохода по списку
+    Elem* C; // Вспомогательная переменная для сохранения предыдущего элемента
     do
     {
-        C = H;
-        H = H->next;
-    } while (H != nullptr && value > H->value); // Доходим до места вставки
-    if (H == nullptr) { // Элемент встает на последнее место
-        C->next = NewNode;
-        NewNode->prev = C;
-    }
-    else {
-        C->next = NewNode;
-        NewNode->prev = C;
-        NewNode->next = H;
-        H->prev = NewNode; // Элемент встает в середину, добавляем ссылку на следующий элемент, а у следующего меняем на новый предыдущий
-    }
+        C = H; // Сохраняем ссылку на текущий элемент
+        H = H->next; // Берем следующий
+    } while (H != nullptr); // Пока не дойдем до конца
+    Elem* NewNode = new Elem;
+    NewNode->value = value;
+    NewNode->next = nullptr;
+    C->next = NewNode; // Добавляем ссылку на последний элемент
 }
 
 #pragma endregion
@@ -85,38 +73,26 @@ void BrListFromFirstInt(ElemInt* head) {
 }
 
 // Добавление элемента
-void AddElemInt(ElemInt*& head, int value) {
-    ElemInt* NewNode = new ElemInt; // Создание нового
-    NewNode->value = value;
-    NewNode->next = nullptr;
-    NewNode->prev = nullptr;
-    if (head == nullptr) // Список пустой
+void AddElemInt(ElemInt*& head, int value)
+{
+    if (head == nullptr) // если список пустой
     {
-        head = NewNode;
+        head = new ElemInt;
+        head->value = value;
+        head->next = nullptr;
         return;
     }
-    ElemInt* H = head;
-    if (head->value > value) { // Элемент встает на первое место
-        head = NewNode;
-        head->next = H;
-        return;
-    }
-    ElemInt* C;
+    ElemInt* H = head; // Для прохода по списку
+    ElemInt* C; // Вспомогательная переменная для сохранения предыдущего элемента
     do
     {
-        C = H;
-        H = H->next;
-    } while (H != nullptr && value > H->value); // Доходим до места вставки
-    if (H == nullptr) { // Элемент встает на последнее место
-        C->next = NewNode;
-        NewNode->prev = C;
-    }
-    else {
-        C->next = NewNode;
-        NewNode->prev = C;
-        NewNode->next = H;
-        H->prev = NewNode; // Элемент встает в середину, добавляем ссылку на следующий элемент, а у следующего меняем на новый предыдущий
-    }
+        C = H; // Сохраняем ссылку на текущий элемент
+        H = H->next; // Берем следующий
+    } while (H != nullptr); // Пока не дойдем до конца
+    ElemInt* NewNode = new ElemInt;
+    NewNode->value = value;
+    NewNode->next = nullptr;
+    C->next = NewNode; // Добавляем ссылку на последний элемент
 }
 
 #pragma endregion
@@ -348,15 +324,15 @@ int main()
     //cout << ReadFromFile(path) << endl;
     
     //Чтение записей в список
-    //head = ReadAllFile(path, '\n');
-    //BrListFromFirst(head);
+    head = ReadAllFile(path, '\n');
+    BrListFromFirst(head);
 
     //Добавление записей в файл c числами
     //AddSeveralNotesToFile(pathNumbers, "out");
     
     //Чтение чисел в список
-    //headInt = ReadNumsAllFile(pathNumbers);
-    //BrListFromFirstInt(headInt);
+    headInt = ReadNumsAllFile(pathNumbers);
+    BrListFromFirstInt(headInt);
 
     // Запись структуры и чтение из определенного места
     /*string pathPerson = "examplePerson.txt";
