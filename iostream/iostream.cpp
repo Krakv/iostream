@@ -53,6 +53,8 @@ void AddElem(Elem*& head, string value) {
         NewNode->prev = C;
     }
     else {
+        C->next = NewNode;
+        NewNode->prev = C;
         NewNode->next = H;
         H->prev = NewNode; // Элемент встает в середину, добавляем ссылку на следующий элемент, а у следующего меняем на новый предыдущий
     }
@@ -127,96 +129,145 @@ struct Person {
 
 void CreateFile(string FilePath) {
     ofstream ofile;
-    ofile.exceptions(ofstream::badbit | ofstream::failbit);
-    try
-    {
-        ofile.open(FilePath);
+    ofile.open(FilePath);
+    if (ofile.is_open())
         cout << "CREATED\n";
-        ofile.close();
-    }
-    catch (std::ios_base::failure& e) {
-        cout << e.what() << " CATCHED\n";
-        ofile.clear();
-    }
-}
-
-void WriteLineToFile(string FilePath) {
-    ofstream ofile;
-    ofile.exceptions(ofstream::badbit | ofstream::failbit);
-    try
-    {
-        ofile.open(FilePath);
-        cout << "Write a sentence: \n";
-        string l; getline(cin, l);
-        l = l + "\n";
-        auto new_text = l.c_str();
-        ofile.write(new_text, strlen(new_text));
-        ofile.close();
-    }
-    catch (std::ios_base::failure& e) {
-        cout << e.what() << " CATCHED\n";
-        ofile.clear();
-    }
-}
-
-void AddSeveralNotesToFile(string FilePath) {
-    ofstream ofile;
-    ofile.exceptions(ofstream::badbit | ofstream::failbit);
-    try {
-        ofile.open(FilePath, ios::app);
-        cout << "Write sentences. Write 'stop' to stop writing sentences\n";
-        string l; getline(cin, l);
-        l = l + "\n";
-        auto new_text = l.c_str();
-        do
-        {
-            ofile.write(new_text, strlen(new_text));
-            getline(cin, l);
-            l = l + "\n";
-            new_text = l.c_str();
-        } while (l != "\n" && l != "stop\n");
-    }
-    catch (std::ios_base::failure& e) {
-        cout << e.what() << " CATCHED\n";
-        ofile.clear();
-    }
+    else
+        cout << "IS NOT OPENED\n";
     ofile.close();
 }
 
-string ReadLineFromFile(string FilePath) {
+#pragma region WRITE
+
+void WriteToFile(string FilePath) {
+    ofstream ofile;
+    ofile.open(FilePath);
+    if (ofile.is_open()) {
+        ofile.exceptions(ofstream::badbit | ofstream::failbit);
+        try
+        {
+            cout << "Write a sentence: \n";
+            string l; getline(cin, l);
+            l = l + "\n";
+            auto new_text = l.c_str();
+            ofile.write(new_text, strlen(new_text));
+        }
+        catch (std::ios_base::failure& e) {
+            cout << e.what() << "\nWRITE_ERROR\n";
+            ofile.clear();
+        }
+        ofile.close();
+    }
+    else {
+        cout << "IS NOT OPENED\n";
+    }
+}
+
+void AddSeveralNotesToFile(string FilePath, string type = "out") {
+    ofstream ofile;
+    auto flag = ios::out;
+    if (type == "app")
+        flag = ios::app;
+    ofile.open(FilePath, flag);
+    if (ofile.is_open())
+    {
+        ofile.exceptions(ofstream::badbit | ofstream::failbit);
+        try {
+            cout << "Write sentences. Write 'stop' to stop writing sentences\n";
+            string l; 
+            getline(cin, l);
+            l += "\n";
+            auto new_text = l.c_str();
+            do
+            {
+                ofile.write(new_text, strlen(new_text));
+                getline(cin, l);
+                l += "\n";
+                new_text = l.c_str();
+            } while (l != "\n" && l != "stop\n");
+        }
+        catch (std::ios_base::failure& e) {
+            cout << e.what() << "\nWRITE_ERROR\n";
+            ofile.clear();
+        }
+        ofile.close();
+    }
+    else {
+        cout << "IS NOT OPENED\n";
+    }
+}
+
+void WritePersonToFile(string FilePath, Person* p) {
+    ofstream ofile;
+    ofile.open(FilePath, ios::app);
+    if (ofile.is_open())
+    {
+        ofile.exceptions(ofstream::badbit | ofstream::failbit);
+        try
+        {
+            ofile.write((char*)&p, sizeof(p));
+        }
+        catch (std::ios_base::failure& e) {
+            cout << e.what() << "\nWRITE_ERROR\n";
+            ofile.clear();
+        }
+        ofile.close();
+    }
+    else {
+        cout << "IS NOT OPENED\n";
+    }
+}
+
+#pragma endregion
+
+#pragma region READ
+
+string ReadFromFile(string FilePath, char separator = '\n') {
     ifstream ifile;
     string text = "";
-    ifile.exceptions(ofstream::badbit | ofstream::failbit);
-    try
+    ifile.open(FilePath);
+    if (ifile.is_open())
     {
-        ifile.open(FilePath);
-        getline(ifile, text);
+        ifile.exceptions(ofstream::badbit | ofstream::failbit);
+        try
+        {
+            getline(ifile, text, separator);
+        }
+        catch (std::ios_base::failure& e) {
+            cout << e.what() << "\nREAD_ERROR\n";
+            ifile.clear();
+        }
     }
-    catch (std::ios_base::failure& e) {
-        cout << e.what() << " CATCHED\n";
-        ifile.clear();
+    else {
+        cout << "IS NOT OPENED\n";
     }
     return text;
 }
 
-Elem* ReadAllFile(string FilePath, char separator) {
+Elem* ReadAllFile(string FilePath, char separator = '\n') {
     Elem* head = nullptr;
     ifstream ifile;
     string text;
-    ifile.exceptions(ofstream::badbit | ofstream::failbit);
-    try
+    ifile.open(FilePath);
+    if(ifile.is_open())
     {
-        ifile.open(FilePath);
-        while (!ifile.eof()) {
-            getline(ifile, text, separator);
-            AddElem(head, text);
+        ifile.exceptions(ofstream::badbit | ofstream::failbit);
+        try
+        {
+            while (!ifile.eof()) {
+                getline(ifile, text, separator);
+                AddElem(head, text);
+            }
         }
+        catch (std::ios_base::failure& e) {
+            cout << e.what() << "\nREAD_ERROR\n";
+            ifile.clear();
+        }
+        ifile.close();
     }
-    catch (...) {
-        cout << "CATCHED\n";
-        ifile.clear();
+    else {
+        cout << "IS NOT OPENED\n";
     }
-    ifile.close();
     return head;
 }
 
@@ -224,105 +275,106 @@ ElemInt* ReadNumsAllFile(string FilePath) {
     ElemInt* head = nullptr;
     ifstream ifile;
     int num;
-    ifile.exceptions(ofstream::badbit | ofstream::failbit);
-    try
+    ifile.open(FilePath);
+    if (ifile.is_open())
     {
-        ifile.open(FilePath);
-        while (!ifile.eof()) {
-            ifile >> num;
-            AddElemInt(head, num);
+        ifile.exceptions(ofstream::badbit | ofstream::failbit);
+        try
+        {
+            while (!ifile.eof()) {
+                ifile >> num;
+                AddElemInt(head, num);
+            }
         }
+        catch (std::ios_base::failure& e) {
+            cout << e.what() << "\nREAD_ERROR\n";
+            ifile.clear();
+        }
+        ifile.close();
     }
-    catch (...) {
-        cout << "CATCHED\n";
-        ifile.clear();
+    else {
+        cout << "IS NOT OPENED\n";
     }
-    ifile.close();
     return head;
 }
 
-void WriteNoteToFile(string FilePath, Person* p) {
-    ofstream ofile;
-    ofile.exceptions(ofstream::badbit | ofstream::failbit);
-    try
-    {
-        ofile.open(FilePath, ios::app);
-        ofile.write((char*)&p, sizeof(p));
-        ofile.close();
-    }
-    catch (std::ios_base::failure& e) {
-        cout << e.what() << " CATCHED\n";
-        ofile.clear();
-    }
-}
-
-Person* ReadNotesFromFile(string FilePath, int pos) {
+Person* ReadPersonFromFile(string FilePath, int pos) {
     Person* p = nullptr;
     ifstream ifile;
-    ifile.exceptions(ofstream::badbit | ofstream::failbit);
-    try
+    ifile.open(FilePath);
+    if (ifile.is_open())
     {
-        ifile.open(FilePath);
-        ifile.seekg(sizeof(p)*pos);
-        if (!ifile.eof())
-            ifile.read((char*) &p, sizeof(p));
+        ifile.exceptions(ofstream::badbit | ofstream::failbit);
+        try
+        {
+            ifile.seekg(sizeof(p) * pos);
+            if (!ifile.eof())
+                ifile.read((char*)&p, sizeof(p));
+        }
+        catch (std::ios_base::failure& e) {
+            cout << e.what() << "\nREAD_ERROR\n";
+            ifile.clear();
+        }
+        ifile.close();
     }
-    catch (...) {
-        cout << "CATCHED\n";
-        ifile.clear();
+    else {
+        cout << "IS NOT OPENED\n";
     }
-    ifile.close();
     return p;
 }
+
+#pragma endregion
 
 int main()
 {
     string wrongPath = "C:/Program Files/example.txt";
     string path = "example.txt";
+    string pathNumbers = "exampleNumbers.txt";
     
     Elem* head;
     ElemInt* headInt;
     
-
-
+    //Создание файла
     //CreateFile(wrongPath);
     //CreateFile(path);
 
+    //Запись в файл
+    //WriteToFile(path);
 
-    //WriteLineToFile(path);
+    //Добавление записей в файл
+    //AddSeveralNotesToFile(path, "app");
 
-
-    //cout << ReadLineFromFile(path) << endl;
-
-    //AddSeveralNotesToFile(path);
+    //Чтение записи из файла
+    //cout << ReadFromFile(path) << endl;
     
+    //Чтение записей в список
     //head = ReadAllFile(path, '\n');
     //BrListFromFirst(head);
 
-    //headInt = ReadNumsAllFile(path);
+    //Добавление записей в файл c числами
+    //AddSeveralNotesToFile(pathNumbers, "out");
+    
+    //Чтение чисел в список
+    //headInt = ReadNumsAllFile(pathNumbers);
     //BrListFromFirstInt(headInt);
 
     // Запись структуры и чтение из определенного места
-    string pathPerson = "examplePerson.txt";
-    Person* p = new Person();
+    /*string pathPerson = "examplePerson.txt";
     Person* newP;
 
     CreateFile(pathPerson);
-    WriteNoteToFile(pathPerson, p);
-    p = new Person();
-    p->Age = 81;
-    p->BodyMassIndex = 29;
-    p->Name = "Alex";
-    WriteNoteToFile(pathPerson, p);
-    p = new Person();
-    p->Age = 23;
-    p->BodyMassIndex = 21.32412;
-    p->Name = "Nikolayllll";
-    WriteNoteToFile(pathPerson, p);
-    newP = ReadNotesFromFile(pathPerson, 0);
-    cout << newP->Name << " " << newP->Age << " " << newP->BodyMassIndex << endl;
-    newP = ReadNotesFromFile(pathPerson, 1);
-    cout << newP->Name << " " << newP->Age << " " << newP->BodyMassIndex << endl;
-    newP = ReadNotesFromFile(pathPerson, 2);
-    cout << newP->Name << " " << newP->Age << " " << newP->BodyMassIndex << endl;
+
+    Person* p = new Person();
+    WritePersonToFile(pathPerson, p);
+
+    p = new Person(); p->Age = 81; p->BodyMassIndex = 29;p->Name = "Alex";
+    WritePersonToFile(pathPerson, p);
+
+    p = new Person(); p->Age = 23; p->BodyMassIndex = 21.32412; p->Name = "Nikolayllll";
+    WritePersonToFile(pathPerson, p);
+
+    for (int i = 2; i >= 0; i--) {
+        newP = ReadPersonFromFile(pathPerson, i);
+        cout << newP->Name << " " << newP->Age << " " << newP->BodyMassIndex << endl;
+    }*/
 }
