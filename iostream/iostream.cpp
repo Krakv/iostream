@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace std;
 
-#pragma region List
+#pragma region ListString
 
 // Создание структуры элемента списка
 struct Elem {
@@ -11,26 +11,6 @@ struct Elem {
     Elem* next;
     Elem* prev; // Ссылка на предыдущий элемент
 };
-
-string GetElemValue(Elem* elem) {
-    return elem->value;
-}
-
-Elem* GetElemNext(Elem* elem) {
-    if (elem->next != nullptr) {
-        return elem->next;
-    }
-    else
-        throw out_of_range("Out of range");
-}
-
-Elem* GetElemPrev(Elem* elem) {
-    if (elem->prev != nullptr) {
-        return elem->prev;
-    }
-    else
-        throw out_of_range("Out of range");
-}
 
 // Процедура просмотра элементов списка от головы к хвосту
 void BrListFromFirst(Elem* head) {
@@ -43,57 +23,6 @@ void BrListFromFirst(Elem* head) {
         head = head->next;
     }
     cout << endl;
-}
-
-// Процедура просмотра элементов списка от хвоста к голове (итерационно)
-void BrListFromEnd(Elem* head) {
-    if (head == nullptr) {
-        cout << "Список пуст" << endl;
-        return;
-    }
-    Elem* C;
-    while (head->next != nullptr) { // Доходим до последнего элемента
-        head = head->next;
-    }
-    while (head != nullptr) { // Выводим в обратном порядке
-        cout << head->value << " ";
-        head = head->prev; // Берем предыдущий элемент
-    }
-}
-
-// Удаление элемента
-void DeleteElems(Elem*& head, string EV)
-{
-    bool isDeleted = false;
-    Elem* H = head;
-    Elem* C = nullptr;
-    while (H != nullptr)
-    { // Список не пуст - ищем в нём элемент для удаления:
-        if (H->value == EV) // Элемент найден
-        {
-            if (H == head) // Удаляется элемент из головы списка
-            {
-                head = H->next;
-                delete H;
-                H = head;
-            }
-            else // Удаляется элемент из хвоста списка
-            {
-                C->next = H->next;
-                if (H->next != nullptr) //Если следующий элемент существует, 
-                    H->next->prev = C; // присваиваем к его ссылке на предыдущий элемент новый
-                delete H;
-                H = C->next;
-            }
-            isDeleted = true;
-            cout << "Элемент удалён!" << endl;
-            continue;
-        }
-        C = H;
-        H = H->next;
-    }
-    if (!isDeleted)
-        cout << "Нет элемента для удаления!" << endl;
 }
 
 // Добавление элемента
@@ -129,58 +58,72 @@ void AddElem(Elem*& head, string value) {
     }
 }
 
-// Поиск
-void Find(Elem* head, string value) {
-    int count = 0;
-    for (int index = 0; head != nullptr; index++) {
-        if (head->value == value) {
-            cout << "Номер: " << index + 1 << endl;
-            count++;
-        }
+#pragma endregion
+
+#pragma region ListInt
+
+// Создание структуры элемента списка
+struct ElemInt {
+    int value;
+    ElemInt* next;
+    ElemInt* prev; // Ссылка на предыдущий элемент
+};
+
+// Процедура просмотра элементов списка от головы к хвосту
+void BrListFromFirstInt(ElemInt* head) {
+    if (head == nullptr) {
+        cout << "Список пуст" << endl;
+        return;
+    }
+    while (head != nullptr) {
+        cout << head->value << " ";
         head = head->next;
     }
-    if (count)
-        cout << "Количество совпадений: " << count << endl;
-    else
-        cout << "Не найдено." << endl;
+    cout << endl;
 }
 
-string Get(Elem* list, int index) {
-    /*if (list == nullptr)
-        RaiseException(EXCEPTION_ACCESS_VIOLATION, EXCEPTION_NONCONTINUABLE, NULL, NULL);*/
-    while (list->prev != nullptr) {
-        list = list->prev;
+// Добавление элемента
+void AddElemInt(ElemInt*& head, int value) {
+    ElemInt* NewNode = new ElemInt; // Создание нового
+    NewNode->value = value;
+    NewNode->next = nullptr;
+    NewNode->prev = nullptr;
+    if (head == nullptr) // Список пустой
+    {
+        head = NewNode;
+        return;
     }
-    int counter = 0;
-    while (list->next != nullptr) {
-        if (counter++ == index)
-            return list->value;
-        list = list->next;
+    ElemInt* H = head;
+    if (head->value > value) { // Элемент встает на первое место
+        head = NewNode;
+        head->next = H;
+        return;
     }
-    if (counter == index) {
-        return list->value;
+    ElemInt* C;
+    do
+    {
+        C = H;
+        H = H->next;
+    } while (H != nullptr && value > H->value); // Доходим до места вставки
+    if (H == nullptr) { // Элемент встает на последнее место
+        C->next = NewNode;
+        NewNode->prev = C;
     }
-    throw out_of_range("Out of range");
-}
-
-void Put(Elem* list, int index, string value) {
-    /*if (list == nullptr)
-        RaiseException(EXCEPTION_ACCESS_VIOLATION, EXCEPTION_NONCONTINUABLE, NULL, NULL);*/
-    while (list->prev != nullptr) {
-        list = list->prev;
+    else {
+        C->next = NewNode;
+        NewNode->prev = C;
+        NewNode->next = H;
+        H->prev = NewNode; // Элемент встает в середину, добавляем ссылку на следующий элемент, а у следующего меняем на новый предыдущий
     }
-    int counter = 0;
-    while (list->next != nullptr) {
-        if (counter++ == index)
-            list->value = value;
-        list = list->next;
-    }
-    if (counter == index)
-        list->value = value;
-    throw out_of_range("Out of range");
 }
 
 #pragma endregion
+
+struct Person {
+    const char * Name = "Ivan";
+    int Age = 18;
+    float BodyMassIndex = 23.1;
+};
 
 void CreateFile(string FilePath) {
     ofstream ofile;
@@ -256,7 +199,7 @@ string ReadLineFromFile(string FilePath) {
     return text;
 }
 
-Elem* ReadAllFile(string FilePath) {
+Elem* ReadAllFile(string FilePath, char separator) {
     Elem* head = nullptr;
     ifstream ifile;
     string text;
@@ -265,7 +208,7 @@ Elem* ReadAllFile(string FilePath) {
     {
         ifile.open(FilePath);
         while (!ifile.eof()) {
-            getline(ifile, text, '\n');
+            getline(ifile, text, separator);
             AddElem(head, text);
         }
     }
@@ -277,46 +220,109 @@ Elem* ReadAllFile(string FilePath) {
     return head;
 }
 
-string ReadFragmentFromFile(string FilePath, int firstPos, int lastPos) {
+ElemInt* ReadNumsAllFile(string FilePath) {
+    ElemInt* head = nullptr;
     ifstream ifile;
-    string text = "";
-    char sym;
+    int num;
     ifile.exceptions(ofstream::badbit | ofstream::failbit);
     try
     {
         ifile.open(FilePath);
-        ifile.seekg(streampos(firstPos));
-        while (ifile.tellg() != streampos(lastPos) && !ifile.eof()) {
-            if(ifile.get(sym))
-                text += sym;
+        while (!ifile.eof()) {
+            ifile >> num;
+            AddElemInt(head, num);
         }
     }
-    catch (std::ios_base::failure& e) {
-        cout << "Out of range\n";
+    catch (...) {
+        cout << "CATCHED\n";
         ifile.clear();
     }
-    return text;
+    ifile.close();
+    return head;
+}
+
+void WriteNoteToFile(string FilePath, Person* p) {
+    ofstream ofile;
+    ofile.exceptions(ofstream::badbit | ofstream::failbit);
+    try
+    {
+        ofile.open(FilePath, ios::app);
+        ofile.write((char*)&p, sizeof(p));
+        ofile.close();
+    }
+    catch (std::ios_base::failure& e) {
+        cout << e.what() << " CATCHED\n";
+        ofile.clear();
+    }
+}
+
+Person* ReadNotesFromFile(string FilePath, int pos) {
+    Person* p = nullptr;
+    ifstream ifile;
+    ifile.exceptions(ofstream::badbit | ofstream::failbit);
+    try
+    {
+        ifile.open(FilePath);
+        ifile.seekg(sizeof(p)*pos);
+        if (!ifile.eof())
+            ifile.read((char*) &p, sizeof(p));
+    }
+    catch (...) {
+        cout << "CATCHED\n";
+        ifile.clear();
+    }
+    ifile.close();
+    return p;
 }
 
 int main()
 {
     string wrongPath = "C:/Program Files/example.txt";
     string path = "example.txt";
+    
     Elem* head;
+    ElemInt* headInt;
+    
+
 
     //CreateFile(wrongPath);
     //CreateFile(path);
 
-    //WriteLineToFile(wrongPath);
+
     //WriteLineToFile(path);
 
-    //ReadLineFromFile(wrongPath);
+
     //cout << ReadLineFromFile(path) << endl;
 
     //AddSeveralNotesToFile(path);
     
-    //head = ReadAllFile(path);
+    //head = ReadAllFile(path, '\n');
     //BrListFromFirst(head);
 
-    //cout << ReadFragmentFromFile(path, 5, 40) << endl;
+    //headInt = ReadNumsAllFile(path);
+    //BrListFromFirstInt(headInt);
+
+    // Запись структуры и чтение из определенного места
+    string pathPerson = "examplePerson.txt";
+    Person* p = new Person();
+    Person* newP;
+
+    CreateFile(pathPerson);
+    WriteNoteToFile(pathPerson, p);
+    p = new Person();
+    p->Age = 81;
+    p->BodyMassIndex = 29;
+    p->Name = "Alex";
+    WriteNoteToFile(pathPerson, p);
+    p = new Person();
+    p->Age = 23;
+    p->BodyMassIndex = 21.32412;
+    p->Name = "Nikolayllll";
+    WriteNoteToFile(pathPerson, p);
+    newP = ReadNotesFromFile(pathPerson, 0);
+    cout << newP->Name << " " << newP->Age << " " << newP->BodyMassIndex << endl;
+    newP = ReadNotesFromFile(pathPerson, 1);
+    cout << newP->Name << " " << newP->Age << " " << newP->BodyMassIndex << endl;
+    newP = ReadNotesFromFile(pathPerson, 2);
+    cout << newP->Name << " " << newP->Age << " " << newP->BodyMassIndex << endl;
 }
