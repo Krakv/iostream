@@ -1,15 +1,22 @@
 ﻿#include <fstream>
 #include <string>
 #include <iostream>
+#include <bitset>
+#include <intrin.h>
 using namespace std;
+
+void Check(unsigned int eflags) {
+    bitset<12> binary(eflags);
+    if (binary[0] || binary[11])
+        throw overflow_error("OverFlow");
+}
 
 #pragma region ListString
 
 // Создание структуры элемента списка
 struct Elem {
-    string value;
-    Elem* next;
-    Elem* prev; // Ссылка на предыдущий элемент
+    string value = "";
+    Elem* next = nullptr;
 };
 
 // Процедура просмотра элементов списка от головы к хвосту
@@ -54,9 +61,8 @@ void AddElem(Elem*& head, string value)
 
 // Создание структуры элемента списка
 struct ElemInt {
-    int value;
-    ElemInt* next;
-    ElemInt* prev; // Ссылка на предыдущий элемент
+    int value = 0;
+    ElemInt* next = nullptr;
 };
 
 // Процедура просмотра элементов списка от головы к хвосту
@@ -93,6 +99,20 @@ void AddElemInt(ElemInt*& head, int value)
     NewNode->value = value;
     NewNode->next = nullptr;
     C->next = NewNode; // Добавляем ссылку на последний элемент
+}
+
+int Sum(ElemInt* head) {
+    int sum = 0;
+    if (head == nullptr) {
+        cout << "Список пуст" << endl;
+        return 0;
+    }
+    while (head != nullptr) {
+        sum += head->value;
+        Check(__readeflags());
+        head = head->next;
+    }
+    return sum;
 }
 
 #pragma endregion
@@ -306,6 +326,7 @@ int main()
     string wrongPath = "C:/Program Files/example.txt";
     string path = "example.txt";
     string pathNumbers = "exampleNumbers.txt";
+    string pathSum = "nums.txt";
     
     Elem* head;
     ElemInt* headInt;
@@ -324,15 +345,21 @@ int main()
     //cout << ReadFromFile(path) << endl;
     
     //Чтение записей в список
-    head = ReadAllFile(path, '\n');
-    BrListFromFirst(head);
+    //head = ReadAllFile(path, '\n');
+    //BrListFromFirst(head);
 
     //Добавление записей в файл c числами
     //AddSeveralNotesToFile(pathNumbers, "out");
     
     //Чтение чисел в список
-    headInt = ReadNumsAllFile(pathNumbers);
-    BrListFromFirstInt(headInt);
+    //headInt = ReadNumsAllFile(pathNumbers);
+    //BrListFromFirstInt(headInt);
+
+    //Чтение чисел в список
+    //headInt = ReadNumsAllFile(pathNumbers);
+    //BrListFromFirstInt(headInt);
+    //headInt = ReadNumsAllFile(pathSum);
+    //cout << Sum(headInt) << endl;
 
     // Запись структуры и чтение из определенного места
     /*string pathPerson = "examplePerson.txt";
