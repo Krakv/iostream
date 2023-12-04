@@ -318,5 +318,5 @@ int main()
     //head = ReadAllFile(path);
     //BrListFromFirst(head);
 
-    cout << ReadFragmentFromFile(path, 5, 40) << endl;
+    //cout << ReadFragmentFromFile(path, 5, 40) << endl;
 }
